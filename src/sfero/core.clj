@@ -44,3 +44,13 @@
                                 (permutado (get alfabeto c) idx)) 
                               tokens)]
     (kunigo vektoroj)))
+
+(defn binarigi [v]
+  "Convierte el vector resultante en un vector bipolar puro (1.0 o -1.0).
+   Esto es vital para mantener la capacidad de la memoria de la red."
+  (mapv #(if (>= % 0) 1.0 -1.0) v))
+
+(defn malkresko [v faktoro]
+  "Reduce la intensidad de todos los elementos del vector.
+   El faktoro suele ser algo como 0.95 (pierde un 5% de fuerza)."
+  (mapv #(* % (double faktoro)) v))
