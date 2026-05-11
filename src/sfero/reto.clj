@@ -41,7 +41,7 @@
                 (do
                   (println (format "\nRETO > [%s] Recibido. Propagando..." 
                                    (subs (sfero/haŝi-transakcion vektoro nonce) 0 8)))
-                  (registro/aldoni-transakcion vektoro)
+                  (registro/aldoni-transakcion vektoro nonce)
                   ;; Propagamos a la lista de direcciones host:port
                   (doseq [p peers] (sendi-transakcion p vektoro nonce)))
                 nil)))

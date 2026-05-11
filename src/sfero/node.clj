@@ -52,7 +52,7 @@
                             (fn []  
                               (let [nonce (registro/mini-vektoron pago)]
                                 (registro/ĉu-nova-transakcio? pago nonce)  
-                                (registro/aldoni-transakcion pago)
+                                (registro/aldoni-transakcion pago nonce)
                                 (doseq [p peers] (reto/sendi-transakcion p pago nonce)))))
                         (println ">>> ÉXITO: 1.0 SFE minado y difundido.")
                         (println ">>> ERROR: Fondos insuficientes.")))
@@ -61,7 +61,6 @@
                       (println "\n--- TEST DE CERRADURA ---")
                       (let [firma (sfero/kunigo [id-alice id-bob])]
                         (registro/provi-multisig id-cofre firma 1.0 (fn [] (println "Cerradura OK")))))
-
                 "4" (let [monto 5.0
                           v-debito  (sfero/skali (sfero/inversi id-cofre) monto)
                           v-kredito (sfero/skali v-bob monto)
@@ -71,7 +70,7 @@
                             (fn []
                               (let [nonce (registro/mini-vektoron transfero)]
                                 (registro/ĉu-nova-transakcio? transfero nonce)
-                                (registro/aldoni-transakcion transfero)
+                                (registro/aldoni-transakcion transfero nonce) ;; <-- FIX: Añadido nonce
                                 (doseq [p peers] (reto/sendi-transakcion p transfero nonce)))))
                         (println ">>> ÉXITO: Retiro minado y enviado.")
                         (println ">>> ERROR: Firma o fondos inválidos.")))
@@ -84,11 +83,10 @@
                             (fn []
                               (let [nonce (registro/mini-vektoron transfero)] 
                                 (registro/ĉu-nova-transakcio? transfero nonce)
-                                (registro/aldoni-transakcion transfero)
+                                (registro/aldoni-transakcion transfero nonce) ;; <-- FIX: Añadido nonce
                                 (doseq [p peers] (reto/sendi-transakcion p transfero nonce)))))
                         (println ">>> ÉXITO: Transferencia minada y enviada.")
                         (println ">>> ERROR: Fondos insuficientes.")))
-
                 "0" (System/exit 0)
                 (println "Opción no reconocida."))
               (recur))))))))
