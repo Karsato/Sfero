@@ -11,9 +11,12 @@
                                 :kalkulilo 0}))
 
 (defn- kristaligi [stato]
-  (let [vektoro-kristaligita (sfero/binarigi (:viva stato))]
+  "Cristaliza guardando el vector binarizado pero recordando su peso (energía)."
+  (let [peso-actual (:kalkulilo stato)
+        vektoro-kristaligita (sfero/binarigi (:viva stato))]
     (-> stato
-        (update :arhivo conj vektoro-kristaligita)
+        ;; Guardamos el vector Y su peso
+        (update :arhivo conj {:v vektoro-kristaligita :pezo peso-actual})
         (assoc :viva (vec (repeat sfero/dim 0.0)))
         (assoc :kalkulilo 0))))
 
@@ -25,8 +28,7 @@
                                          (assoc :viva nova-viva)
                                          (update :kalkulilo inc))]
                    (if (>= (:kalkulilo stato-updated) saturigo-limo)
-                     (do (println "SFERO > Cristalizando bloque histórico...")
-                         (kristaligi stato-updated))
+                     (kristaligi stato-updated)
                      stato-updated))))
   (println "SFERO > Registro actualizado."))
 
@@ -41,10 +43,15 @@
     (reduce (fn [acc v] (mapv + acc v)) viva arhivo)))
 
 (defn kalkuli-ekvilibron [identeco-vektoro]
-  "Calcula el saldo sumando la resonancia en toda la cadena."
-  (let [total (vidi-staton-totala)
-        res (sfero/resonanco total identeco-vektoro)]
-    (max 0.0 res)))
+  (let [{:keys [viva arhivo]} @cxeno
+        ;; Resonancia del vector que aún no se ha congelado
+        res-viva (sfero/resonanco viva identeco-vektoro)
+        ;; Resonancia de los bloques congelados multiplicada por su peso
+        res-arhivo (reduce + 0.0 (map (fn [bloque] 
+                                       (* (sfero/resonanco (:v bloque) identeco-vektoro) 
+                                          (:pezo bloque))) 
+                                     arhivo))]
+    (+ res-viva res-arhivo)))
 
 ;; --- INFRAESTRUCTURA ---
 (defonce ^:private infra-strukturo (atom (vec (repeat sfero/dim 0.0))))
