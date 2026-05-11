@@ -78,3 +78,7 @@
     (.putLong bb (long nonce))
     (let [bytes (.digest md (.array bb))]
       (apply str (map #(format "%02x" %) bytes)))))
+
+(defn krei-komunidenton [vektoroj]
+  "Crea una identidad compartida (Multisig) binarizando la suma de varios vectores."
+  (binarigi (kunigo vektoroj)))

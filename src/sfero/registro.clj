@@ -79,3 +79,15 @@
       (do 
         (swap! vidi-listo conj h)
         true))))
+
+(defn provi-multisig [id-komuna id-subskribo valoro f-transakcio]
+  "Solo autoriza si la resonancia entre la clave del cofre y la firma es >= 0.9"
+  (let [akordo (sfero/resonanco id-komuna id-subskribo)]
+    (if (>= akordo 0.9)
+      (do 
+        (f-transakcio)
+        (println (format "GARDA > Multifirma aceptada (Resonancia: %.2f). Energía liberada." (double akordo)))
+        true)
+      (do
+        (println (format "GARDA > Firma insuficiente (Resonancia: %.2f). El cofre permanece cerrado." (double akordo)))
+        false))))
