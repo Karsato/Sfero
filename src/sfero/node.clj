@@ -27,7 +27,7 @@
     (println "Escaneando resonancias de identidad...")
     
     ;; Extraemos el estado actual del registro
-    (let [stato (registro/vidi-staton) 
+    (let [stato (registro/vidi-staton-totala) 
           rezultoj (sfero/skani-registron stato 
                      (into {} (map (fn [[n v]] [n (sfero/ligi monero v)]) vortaro)))]
       

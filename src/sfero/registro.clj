@@ -1,45 +1,47 @@
 (ns sfero.registro
   (:require [sfero.core :as sfero]))
 
-(defonce ^:private stato-globala (atom (vec (repeat sfero/dim 0.0))))
+;; --- CONFIGURACIÓN ---
+(def ^:const saturigo-limo 100) 
+(def ^:const persisteco 0.98)
 
-;; Factor de persistencia (cuánto sobrevive del pasado)
-(def ^:const persisteco 0.9) 
+;; Solo un átomo para gobernarlos a todos
+(defonce ^:private cxeno (atom {:arhivo [] 
+                                :viva (vec (repeat sfero/dim 0.0))
+                                :kalkulilo 0}))
 
+(defn- kristaligi [stato]
+  (let [vektoro-kristaligita (sfero/binarigi (:viva stato))]
+    (-> stato
+        (update :arhivo conj vektoro-kristaligita)
+        (assoc :viva (vec (repeat sfero/dim 0.0)))
+        (assoc :kalkulilo 0))))
+
+;; --- ESCRITURA ---
 (defn aldoni-transakcion [subskribo]
-  "Aplica decaimiento al estado actual y luego integra la nueva firma."
-  (swap! stato-globala 
-         (fn [s] 
-           (let [malnova-stato (sfero/malkresko s persisteco)]
-             (mapv + malnova-stato subskribo))))
-  (println "SFERO > Registro actualizado (Decaimiento aplicado)."))
+  (swap! cxeno (fn [s]
+                 (let [nova-viva (mapv + (sfero/malkresko (:viva s) persisteco) subskribo)
+                       stato-updated (-> s 
+                                         (assoc :viva nova-viva)
+                                         (update :kalkulilo inc))]
+                   (if (>= (:kalkulilo stato-updated) saturigo-limo)
+                     (do (println "SFERO > Cristalizando bloque histórico...")
+                         (kristaligi stato-updated))
+                     stato-updated))))
+  (println "SFERO > Registro actualizado."))
 
-(defn vidi-staton []
-  "Permite que el explorador lea el estado actual del registro."
-  @stato-globala)
-
-(defn kalkuli-ekvilibron [identeco-vektoro]
-  (let [res (sfero/resonanco (vidi-staton) identeco-vektoro)]
-    (max 0.0 (- res 0.05))))
-
-(defn cxu-ekzistas? [subskribo]
-  (let [res (sfero/resonanco @stato-globala subskribo)]
-    (println (format "SFERO > Resonancia actual: %.4f" (double res)))
-    res))
+;; --- LECTURA ---
+(defn vidi-staton-totala []
+  "Devuelve la suma del vector vivo y todo el historial cristalizado."
+  (let [{:keys [viva arhivo]} @cxeno]
+    (reduce (fn [acc v] (mapv + acc v)) viva arhivo)))
 
 (defn kalkuli-ekvilibron [identeco-vektoro]
-  "Calcula cuánto resuena una identidad específica en el registro global.
-   Ese valor de resonancia representa el poder adquisitivo (saldo)."
-  (let [res (sfero/resonanco @stato-globala identeco-vektoro)]
-    ;; Limpiamos el ruido base (ajuste estadístico)
-    (max 0.0 (- res 0.05))))
+  "Calcula el saldo sumando la resonancia en toda la cadena."
+  (let [total (vidi-staton-totala)
+        res (sfero/resonanco total identeco-vektoro)]
+    (max 0.0 res)))
 
+;; --- INFRAESTRUCTURA ---
 (defonce ^:private infra-strukturo (atom (vec (repeat sfero/dim 0.0))))
-
-(defn aldoni-kotizon [kotizo-vektoro]
-  "Acumula la comisión en el vector de infraestructura."
-  (swap! infra-strukturo (fn [s] (mapv + s kotizo-vektoro))))
-
-(defn vidi-infra-staton []
-  "Muestra cuánta energía hay acumulada para los mineros."
-  (sfero/resonanco @infra-strukturo (vec (repeat sfero/dim 1.0)))) ; Medimos energía neta
+(defn aldoni-kotizon [kotizo-vektoro] (swap! infra-strukturo #(mapv + % kotizo-vektoro)))
