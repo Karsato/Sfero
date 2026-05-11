@@ -36,7 +36,8 @@
             (let [nonce (.readLong dis)
                   dim   (.readInt dis)
                   vektoro (vec (repeatedly dim #(.readFloat dis)))]
-              (if (registro/ĉu-nova-transakcio? vektoro nonce)
+              (if (and (registro/valida-minado? vektoro nonce) ;; <-- VALIDA EL TRABAJO
+                       (registro/ĉu-nova-transakcio? vektoro nonce))
                 (do
                   (println (format "\nRETO > [%s] Recibido. Propagando..." 
                                    (subs (sfero/haŝi-transakcion vektoro nonce) 0 8)))

@@ -91,3 +91,19 @@
       (do
         (println (format "GARDA > Firma insuficiente (Resonancia: %.2f). El cofre permanece cerrado." (double akordo)))
         false))))
+
+(def malfacileco 4) ;; Dificultad: número de ceros iniciales en el hash hex
+
+(defn valida-minado? [vektoro nonce]
+  (let [hasxo (sfero/haŝi-transakcion vektoro nonce)
+        celo (apply str (repeat malfacileco "0"))]
+    (.startsWith hasxo celo)))
+
+(defn mini-vektoron [vektoro]
+  (println "MINADO > Buscando resonancia estable (Dificultad:" malfacileco ")...")
+  (loop [n (rand-int 1000000000)]
+    (if (valida-minado? vektoro n)
+      (do
+        (println "MINADO > ¡Encontrado! Nonce:" n "Hash:" (subs (sfero/haŝi-transakcion vektoro n) 0 10))
+        n)
+      (recur (inc n)))))
