@@ -4,9 +4,19 @@
             [clojure.java.io :as io]))
 
 ;; --- CONFIGURACIÓN ---
-(def ^:const saturigo-limo 10)   
+(def ^:const saturigo-limo 10)     
 (def ^:const persisteco 0.98)
-(def malfacileco 4)
+(def ^:const malfacileco 4)
+(def ^:const bloques-por-archivo 5)
+
+
+(defonce ^:private cxeno   
+  (atom (or (konservado/sxargi-cxenon sfero/dim)
+            {:arhivo []   
+             :viva (vec (repeat sfero/dim 0.0))
+             :kalkulilo 0
+             :nonces #{}}))) 
+
 
 ;; --- NUEVA CONFIGURACIÓN EN registro.clj ---
 (def ^:const particion-limo 5) ;; Cada 5 cristales, creamos un archivo nuevo
@@ -29,12 +39,8 @@
 
 ;; Cargamos el estado inicial. 
 ;; Incluimos :nonces para que la red "recuerde" lo visto tras reiniciar.
-(defonce ^:private cxeno   
-  (atom (or (konservado/sxargi-cxenon sfero/dim)
-            {:arhivo []   
-             :viva (vec (repeat sfero/dim 0.0))
-             :kalkulilo 0
-             :nonces #{}}))) 
+
+(defn viva-kalkulilo [] (:kalkulilo @cxeno))
 
 ;; --- LÓGICA DE CRISTALIZACIÓN CON ROTACIÓN ---
 (defn- kristaligi [stato]

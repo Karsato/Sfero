@@ -27,6 +27,13 @@
           
           id-cofre (sfero/krei-komunidenton [id-alice id-bob])]
 
+
+      ;; Inyectamos un saldo inicial de 100 SFE a la red si está vacía
+      (when (zero? (registro/viva-kalkulilo))
+        (println "SFERO > Generando bloque génesis...")
+        (let [genesis (sfero/skali v-alice 100.0)]
+          (registro/aldoni-transakcion genesis 0))) ;; Nonce 0 para el génesis
+      
       (loop []
         (println "\n--- MENÚ DE OPERACIONES ---")
         (println "[1] Ver Saldos (Alice/Bob/Cofre)")
@@ -47,15 +54,10 @@
                      (println (format "SALDO COFRE: %.4f SFE" (registro/kalkuli-ekvilibron id-cofre)))) ;; <-- Asegúrate que cierre aquí
                 "2" (let [monto 1.0
                           pago (sfero/skali v-alice monto)]
-                      (if (registro/provi-transakcion v-alice monto   
-                            (fn []  
-                              (let [nonce (registro/mini-vektoron pago)]
-                                (registro/ĉu-nova-transakcio? pago nonce)  
-                                (registro/aldoni-transakcion pago nonce)
-                                (doseq [p peers] (reto/sendi-transakcion p pago nonce)))))
-                        (println ">>> ÉXITO: 1.0 SFE minado y difundido.")
-                        (println ">>> ERROR: Fondos insuficientes.")))
-
+                      (let [nonce (registro/mini-vektoron pago)]
+                        (registro/aldoni-transakcion pago nonce)
+                        (doseq [p peers] (reto/sendi-transakcion p pago nonce)))
+                      (println ">>> ÉXITO: Alice ha emitido 1.0 SFE (Minting)."))
                 "3" (do
                       (println "\n--- TEST DE CERRADURA ---")
                       (let [firma (sfero/kunigo [id-alice id-bob])]
@@ -73,19 +75,17 @@
                                 (doseq [p peers] (reto/sendi-transakcion p transfero nonce)))))
                         (println ">>> ÉXITO: Retiro minado y enviado.")
                         (println ">>> ERROR: Firma o fondos inválidos.")))
-
                 "5" (let [monto 2.0
-                          v-debito  (sfero/skali (sfero/inversi v-alice) monto)
-                          v-kredito (sfero/skali v-bob monto)
-                          transfero (sfero/kunigo [v-debito v-kredito])]
-                      (if (registro/provi-transakcion v-alice monto 
-                            (fn []
-                              (let [nonce (registro/mini-vektoron transfero)] 
-                                (registro/ĉu-nova-transakcio? transfero nonce)
-                                (registro/aldoni-transakcion transfero nonce) ;; <-- FIX: Añadido nonce
-                                (doseq [p peers] (reto/sendi-transakcion p transfero nonce)))))
-                        (println ">>> ÉXITO: Transferencia minada y enviada.")
-                        (println ">>> ERROR: Fondos insuficientes.")))
+                          v-debito (sfero/skali (sfero/inversi v-alice) monto)
+                                    v-kredito (sfero/skali v-bob monto)
+                                    transfero (sfero/kunigo [v-debito v-kredito])]
+                                (if (registro/provi-transakcion v-alice monto 
+                                      (fn []
+                                        (let [nonce (registro/mini-vektoron transfero)]
+                                          (registro/aldoni-transakcion transfero nonce)
+                                          (doseq [p peers] (reto/sendi-transakcion p transfero nonce)))))
+                                  (println ">>> ÉXITO: Transferencia enviada.")
+                                  (println ">>> ERROR: Fondos insuficientes.")))
                 "0" (System/exit 0)
                 (println "Opción no reconocida."))
               (recur))))))))
