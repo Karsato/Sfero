@@ -13,6 +13,8 @@
              :viva (vec (repeat sfero/dim 0.0))
              :kalkulilo 0})))
 
+
+
 ;; --- LÓGICA DE CRISTALIZACIÓN ---
 (defn- kristaligi [stato]
   (let [peso-actual (:kalkulilo stato)
@@ -66,3 +68,14 @@
         (println (format "GARDA > ALERTA: Fondos insuficientes. Saldo: %.4f | Requerido: %.4f" 
                          saldo valoro-transakcio))
         false))))
+
+(defonce ^:private vidi-listo (atom #{}))
+
+(defn ĉu-nova? [vektoro]
+  "Verifica si el vector es nuevo. Si lo es, guarda su hash y devuelve true."
+  (let [h (sfero/haŝi-vektoron vektoro)]
+    (if (contains? @vidi-listo h)
+      false
+      (do 
+        (swap! vidi-listo conj h)
+        true))))

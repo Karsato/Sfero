@@ -1,5 +1,6 @@
 (ns sfero.core
-  (:import [java.util Random]))
+  (:import [java.util Random])
+  (:import [java.security MessageDigest]))
 
 (def ^:const dim 10000)
 
@@ -69,3 +70,15 @@
   (->> vortaro
        (map (fn [[nomo v]] [nomo (resonanco registro v)]))
        (sort-by second >)))
+
+(defn haŝi-vektoron [vektoro]
+  "Crea un hash SHA-256 a partir de los bytes del vector de floats."
+  (let [md (java.security.MessageDigest/getInstance "SHA-256")
+        ;; Creamos un buffer de bytes: 4 bytes por cada dimensión (float)
+        bb (java.nio.ByteBuffer/allocate (* 4 (count vektoro)))]
+    ;; Llenamos el buffer con los floats
+    (doseq [v vektoro]
+      (.putFloat bb (float v)))
+    ;; Calculamos el hash del array resultante
+    (let [bytes (.digest md (.array bb))]
+      (apply str (map #(format "%02x" %) bytes)))))

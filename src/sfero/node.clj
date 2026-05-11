@@ -15,7 +15,7 @@
     (println "====================================")
 
     ;; Iniciamos el servidor para recibir transacciones
-    (reto/lanzigi-servilon mi-puerto)
+    (reto/lanzigi-servilon mi-puerto peers)
 
     (let [alice (monujo/krei-monujon "alice")
           monero (sfero/naski-vektoron 999)
