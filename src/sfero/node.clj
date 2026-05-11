@@ -10,31 +10,31 @@
   
   (let [alice (monujo/krei-monujon "alice-seed")
         bob (monujo/krei-monujon "bob-seed")
-        
-        ;; Definimos el activo: "SFERO-COIN"
-        monero (sfero/naski-vektoron 999)]
+        monero (sfero/naski-vektoron 999)
+        tasa-comision 0.05] ;; 5% de comisión
 
-    (println "Situación inicial: Alice y Bob tienen saldo 0.")
+    ;; 1. Bob empieza con fondos
+    (registro/aldoni-transakcion (sfero/ligi monero (:id-vektoro bob)))
     
-    ;; 1. Bob recibe dos depósitos (Vinculamos el activo a su ID)
-    (println "\n--- Bob recibe 2 depósitos de la Red ---")
-    (let [deposito-1 (sfero/ligi monero (:id-vektoro bob))
-          deposito-2 (sfero/ligi monero (:id-vektoro bob))]
-      (registro/aldoni-transakcion deposito-1)
-      (registro/aldoni-transakcion deposito-2))
-
-    ;; 2. Consultamos el saldo (Ekvilibro)
-    ;; Para consultar, ligamos el activo al registro y vemos cuánto resuena con el ID
-    (println "\n--- Consultando Saldos en el Hiperespacio ---")
-    
-    (let [saldo-bob (registro/kalkuli-ekvilibron (sfero/ligi monero (:id-vektoro bob)))
-          saldo-alice (registro/kalkuli-ekvilibron (sfero/ligi monero (:id-vektoro alice)))]
+    (println "\n--- Transferencia con Comisión (Kotizo) ---")
+    (let [v-total (sfero/ligi monero (:id-vektoro bob))
+          
+          ;; El gasto de Bob (el 100%)
+          debito-bob (sfero/inversi v-total)
+          
+          ;; Lo que recibe Alice (el 95%)
+          kredito-alice (sfero/skali (sfero/ligi monero (:id-vektoro alice)) (- 1.0 tasa-comision))
+          
+          ;; Lo que recibe la Red (el 5%) - Usamos el mismo vector de Alice pero ligado a la Red
+          v-infra (sfero/naski-vektoron 777) ;; Vector identificador de infraestructura
+          kotizo (sfero/skali (sfero/ligi monero v-infra) tasa-comision)]
       
-      (println (format "Saldo de Bob:   %.4f SFE" saldo-bob))
-      (println (format "Saldo de Alice: %.4f SFE" saldo-alice))
+      ;; Registramos la transferencia y la comisión
+      (registro/aldoni-transakcion (sfero/kunigo [debito-bob kredito-alice]))
+      (registro/aldoni-kotizon kotizo)
 
-      (if (> saldo-bob saldo-alice)
-        (println "\n>>> ÉXITO: El hiperespacio reconoce que Bob es más rico.")
-        (println "\n>>> ERROR: La simetría no se detectó."))))
-  
-  (println "===================================="))
+      (println (format "Saldo Final Bob:   %.4f SFE" (registro/kalkuli-ekvilibron (sfero/ligi monero (:id-vektoro bob)))))
+      (println (format "Saldo Final Alice: %.4f SFE" (registro/kalkuli-ekvilibron (sfero/ligi monero (:id-vektoro alice)))))
+      (println (format "Fondo Red (Infra): %.4f SFE" (sfero/resonanco (sfero/ligi monero v-infra) kotizo))))
+
+    (println "====================================")))

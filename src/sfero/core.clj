@@ -54,3 +54,11 @@
   "Reduce la intensidad de todos los elementos del vector.
    El faktoro suele ser algo como 0.95 (pierde un 5% de fuerza)."
   (mapv #(* % (double faktoro)) v))
+
+(defn inversi [v]
+  "Invierte la polaridad del vector para representar una resta en el hiperespacio."
+  (mapv #(* % -1.0) v))
+
+(defn skali [v faktoro]
+  "Cambia la intensidad del vector. Útil para aplicar comisiones o pesos."
+  (mapv #(* % (double faktoro)) v))

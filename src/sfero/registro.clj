@@ -25,3 +25,13 @@
   (let [res (sfero/resonanco @stato-globala identeco-vektoro)]
     ;; Limpiamos el ruido base (ajuste estadístico)
     (max 0.0 (- res 0.05))))
+
+(defonce ^:private infra-strukturo (atom (vec (repeat sfero/dim 0.0))))
+
+(defn aldoni-kotizon [kotizo-vektoro]
+  "Acumula la comisión en el vector de infraestructura."
+  (swap! infra-strukturo (fn [s] (mapv + s kotizo-vektoro))))
+
+(defn vidi-infra-staton []
+  "Muestra cuánta energía hay acumulada para los mineros."
+  (sfero/resonanco @infra-strukturo (vec (repeat sfero/dim 1.0)))) ; Medimos energía neta
