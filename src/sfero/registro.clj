@@ -18,3 +18,10 @@
   (let [res (sfero/resonanco @stato-globala subskribo)]
     (println (format "SFERO > Resonancia actual: %.4f" (double res)))
     res))
+
+(defn kalkuli-ekvilibron [identeco-vektoro]
+  "Calcula cuánto resuena una identidad específica en el registro global.
+   Ese valor de resonancia representa el poder adquisitivo (saldo)."
+  (let [res (sfero/resonanco @stato-globala identeco-vektoro)]
+    ;; Limpiamos el ruido base (ajuste estadístico)
+    (max 0.0 (- res 0.05))))

@@ -8,31 +8,33 @@
   (println "      SFERO NETWORK - v0.1.0       ")
   (println "====================================")
   
-  (let [alfabeto (let [base (sfero/naski-vektoron 55555)]
-                   (into {} (map (fn [c] [c (sfero/permutado base (int c))]) 
-                                 "abcdefghijklmnopqrstuvwxyz 0123456789")))
-        alice (monujo/krei-monujon "clave-secreta-alice")
-        pago-v (sfero/kodigi-tekston "pago inicial" alfabeto)
-        firma-alice (monujo/subskribi pago-v (:id-vektoro alice))]
+  (let [alice (monujo/krei-monujon "alice-seed")
+        bob (monujo/krei-monujon "bob-seed")
+        
+        ;; Definimos el activo: "SFERO-COIN"
+        monero (sfero/naski-vektoron 999)]
 
-    ;; T0: Añadimos la primera transacción
-    (println "\n--- T0: Primera transacción ---")
-    (registro/aldoni-transakcion firma-alice)
-    (let [res0 (registro/cxu-ekzistas? firma-alice)]
-      (println "Resonancia inicial:" res0))
-
-    ;; T1...T5: Simulamos que pasa el tiempo añadiendo ruido (otras transacciones)
-    (println "\n--- Simulando el paso del tiempo (5 ciclos) ---")
-    (doseq [i (range 1 6)]
-      (let [ruido (sfero/naski-vektoron i)] ;; Simulamos otras firmas
-        (registro/aldoni-transakcion ruido)))
-
-    ;; Verificación final
-    (println "\n--- Verificación tras decaimiento ---")
-    (let [res-final (registro/cxu-ekzistas? firma-alice)]
-      (println "Resonancia actual:" res-final)
-      (if (< res-final 10.0) ;; El valor habrá bajado de los 16 originales
-        (println ">>> EL TIEMPO HA PASADO: La transacción es ahora una memoria lejana.")
-        (println ">>> ERROR: El decaimiento no funcionó.")))
+    (println "Situación inicial: Alice y Bob tienen saldo 0.")
     
-  (println "====================================")))
+    ;; 1. Bob recibe dos depósitos (Vinculamos el activo a su ID)
+    (println "\n--- Bob recibe 2 depósitos de la Red ---")
+    (let [deposito-1 (sfero/ligi monero (:id-vektoro bob))
+          deposito-2 (sfero/ligi monero (:id-vektoro bob))]
+      (registro/aldoni-transakcion deposito-1)
+      (registro/aldoni-transakcion deposito-2))
+
+    ;; 2. Consultamos el saldo (Ekvilibro)
+    ;; Para consultar, ligamos el activo al registro y vemos cuánto resuena con el ID
+    (println "\n--- Consultando Saldos en el Hiperespacio ---")
+    
+    (let [saldo-bob (registro/kalkuli-ekvilibron (sfero/ligi monero (:id-vektoro bob)))
+          saldo-alice (registro/kalkuli-ekvilibron (sfero/ligi monero (:id-vektoro alice)))]
+      
+      (println (format "Saldo de Bob:   %.4f SFE" saldo-bob))
+      (println (format "Saldo de Alice: %.4f SFE" saldo-alice))
+
+      (if (> saldo-bob saldo-alice)
+        (println "\n>>> ÉXITO: El hiperespacio reconoce que Bob es más rico.")
+        (println "\n>>> ERROR: La simetría no se detectó."))))
+  
+  (println "===================================="))
