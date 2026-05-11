@@ -5,12 +5,12 @@
   (:import [java.net ServerSocket Socket]
            [java.io DataOutputStream DataInputStream]))
 
-(defn sendi-transakcion [direccion vektoro nonce]   
+(defn sendi-transakcion [direccion vektoro nonce] 
   (let [[host port] (clojure.string/split direccion #":")]
     (try
       (with-open [sock (Socket. host (Integer/parseInt port))
                   dos  (DataOutputStream. (.getOutputStream sock))]
-        (.writeByte dos 0) ;; Comando: Transacción
+        (.writeByte dos 0) ;; Comando 0: Transacción
         (.writeLong dos (long nonce))
         (.writeInt dos (count vektoro))
         (doseq [v vektoro] (.writeFloat dos (float v))))
@@ -39,7 +39,7 @@
                     (if (.exists f)
                       (do (.writeBoolean dos true)
                           (.writeLong dos (.length f))
-                          (io/copy f dos)) ;; Envío binario seguro
+                          (io/copy f dos))
                       (.writeBoolean dos false)))
                 (println "RETO > Comando desconocido"))))
           (catch Exception e (println "RETO > Error:" (.getMessage e))))))))
