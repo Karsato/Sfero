@@ -53,3 +53,16 @@
 (defn vidi-staton-totala []
   (let [{:keys [viva arhivo]} @cxeno]
     (reduce (fn [acc b] (mapv + acc (:v b))) viva arhivo)))
+
+(defn provi-transakcion [id-sendinto valoro-transakcio f-transakcio]
+  "Verifica si el remitente tiene suficiente resonancia antes de aplicar la función f-transakcio."
+  (let [saldo (kalkuli-ekvilibron id-sendinto)]
+    (if (>= saldo valoro-transakcio)
+      (do
+        (f-transakcio) ;; Ejecutamos la integración (aldoni-transakcion)
+        (println (format "GARDA > Transacción autorizada. Saldo suficiente: %.4f SFE" saldo))
+        true)
+      (do
+        (println (format "GARDA > ALERTA: Fondos insuficientes. Saldo: %.4f | Requerido: %.4f" 
+                         saldo valoro-transakcio))
+        false))))
