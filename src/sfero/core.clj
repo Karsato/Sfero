@@ -46,3 +46,8 @@
 (defn serĉi-plej-proksiman [target-vector memoro]
   "Busca el rastro más cercano en el historial de la red."
   (apply max-key (fn [[_ v]] (resonanco target-vector v)) memoro))
+
+(defn normalizi [v]
+  "Normaliza el vector para que sus valores vuelvan a estar cerca de 1 o -1, 
+   evitando que la 'plastilina' se desborde."
+  (mapv (fn [x] (cond (> x 0) 1.0 (< x 0) -1.0 :else 0.0)) v))
