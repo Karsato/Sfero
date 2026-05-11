@@ -42,10 +42,9 @@
             (do
               (case opcion
                 "1" (do
-                      (println (format "SALDO ALICE: %.4f SFE" (registro/kalkuli-ekvilibron v-alice)))
-                      (println (format "SALDO BOB:   %.4f SFE" (registro/kalkuli-ekvilibron v-bob)))
-                      (println (format "SALDO COFRE: %.4f SFE" (registro/kalkuli-ekvilibron id-cofre))))
-                
+                     (println (format "SALDO ALICE: %.4f SFE" (registro/kalkuli-ekvilibron v-alice)))
+                     (println (format "SALDO BOB:   %.4f SFE" (registro/kalkuli-ekvilibron v-bob)))
+                     (println (format "SALDO COFRE: %.4f SFE" (registro/kalkuli-ekvilibron id-cofre)))) ;; <-- Asegúrate que cierre aquí
                 "2" (let [monto 1.0
                           pago (sfero/skali v-alice monto)]
                       (if (registro/provi-transakcion v-alice monto   
