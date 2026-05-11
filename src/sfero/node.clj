@@ -27,14 +27,18 @@
         (let [opcion (read-line)]
           (case opcion
             "1" (println "SALDO ACTUAL:" (registro/kalkuli-ekvilibron id-alice) "SFE")
-            "2" (let [pago (sfero/skali id-alice 1.0)]
-                  ;; Si el guardián lo aprueba, lo enviamos a los demás
-                  (if (registro/provi-transakcion id-alice 1.0 
-                        (fn [] 
-                          (registro/aldoni-transakcion pago)
-                          (doseq [p peers] (reto/sendi-vektoron "localhost" p pago))))
-                    (println ">>> DIFUNDIDO: El vector está viajando por la red.")
-                    (println ">>> RECHAZADO: No tienes saldo para difundir.")))
+            "2" (let [monto 1.0
+          nonce (rand-nth (range 1000000000)) ;; Generamos un Nonce aleatorio
+          pago (sfero/skali id-alice monto)]
+      (if (registro/provi-transakcion id-alice monto 
+            (fn [] 
+              ;; Registramos localmente con el nonce
+              (registro/ĉu-nova-transakcio? pago nonce) 
+              (registro/aldoni-transakcion pago)
+              ;; Enviamos a la red
+              (doseq [p peers] (reto/sendi-transakcion "localhost" p pago nonce))))
+        (println ">>> DIFUNDIDO: Transacción única enviada con éxito.")
+        (println ">>> RECHAZADO: Fondos insuficientes.")))
             "0" (System/exit 0)
             nil)
           (recur))))))

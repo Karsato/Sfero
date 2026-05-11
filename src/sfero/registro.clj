@@ -71,9 +71,9 @@
 
 (defonce ^:private vidi-listo (atom #{}))
 
-(defn ĉu-nova? [vektoro]
-  "Verifica si el vector es nuevo. Si lo es, guarda su hash y devuelve true."
-  (let [h (sfero/haŝi-vektoron vektoro)]
+(defn ĉu-nova-transakcio? [vektoro nonce]
+  ;; Aquí usamos el nuevo nombre: sfero/haŝi-transakcion
+  (let [h (sfero/haŝi-transakcion vektoro nonce)]
     (if (contains? @vidi-listo h)
       false
       (do 
