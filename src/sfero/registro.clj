@@ -2,7 +2,7 @@
   (:require [sfero.core :as sfero]))
 
 ;; --- CONFIGURACIÓN ---
-(def ^:const saturigo-limo 100) 
+(def ^:const saturigo-limo 10) 
 (def ^:const persisteco 0.98)
 
 ;; Solo un átomo para gobernarlos a todos
@@ -29,6 +29,10 @@
                          (kristaligi stato-updated))
                      stato-updated))))
   (println "SFERO > Registro actualizado."))
+
+;; --- FUNCIONES PÚBLICAS (LECTURA/REPORTES) ---
+(defn arkivo-grandeco [] (count (:arhivo @cxeno)))
+(defn viva-kalkulilo [] (:kalkulilo @cxeno))
 
 ;; --- LECTURA ---
 (defn vidi-staton-totala []

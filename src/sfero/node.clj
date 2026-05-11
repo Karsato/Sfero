@@ -6,38 +6,35 @@
 (defn -main [& args]
   (println "====================================")
   (println "      SFERO NETWORK - v0.1.0       ")
+  (println "   Test de Cristalización Masiva    ")
   (println "====================================")
   
   (let [alice (monujo/krei-monujon "alice")
-        bob (monujo/krei-monujon "bob")
-        carol (monujo/krei-monujon "carol")
         monero (sfero/naski-vektoron 999)
-        
-        ;; Diccionario para el explorador
-        vortaro {"Alice" (:id-vektoro alice)
-                 "Bob"   (:id-vektoro bob)
-                 "Carol" (:id-vektoro carol)}]
+        total-transakcioj 25]
 
-    (println "--- Generando actividad en la red ---")
-    ;; Alice recibe 3 pagos, Bob 1, Carol 0
-    (dotimes [_ 3] (registro/aldoni-transakcion (sfero/ligi monero (:id-vektoro alice))))
-    (registro/aldoni-transakcion (sfero/ligi monero (:id-vektoro bob)))
-
-    (println "\n--- SFERO ESPLORILO (Explorador de Hiperespacio) ---")
-    (println "Escaneando resonancias de identidad...")
+    (println "--- Iniciando ráfaga de 25 transacciones para Alice ---")
     
-    ;; Extraemos el estado actual del registro
-    (let [stato (registro/vidi-staton-totala) 
-          rezultoj (sfero/skani-registron stato 
-                     (into {} (map (fn [[n v]] [n (sfero/ligi monero v)]) vortaro)))]
-      
-      (doseq [[nomo valoro] rezultoj]
-        (let [bar-length (int (* valoro 10))]
-          (println (format "%-10s [%-15s] %.4f SFE" 
-                           nomo 
-                           (apply str (repeat (max 0 bar-length) "█")) 
-                           (double valoro)))))
+    (dotimes [n total-transakcioj]
+      (let [pago (sfero/ligi monero (:id-vektoro alice))]
+        (registro/aldoni-transakcion pago)
+        ;; Cada 5 transacciones, hacemos un reporte de estado
+        (when (zero? (mod (inc n) 5))
+          (println (format ">> Progreso: %d/%d | Bloques en archivo: %d | En vivo: %d" 
+                           (inc n) total-transakcioj 
+                           (registro/arkivo-grandeco)
+                           (registro/viva-kalkulilo))))))
 
-      (println "\n>>> Análisis: El hiperespacio muestra una clara dominancia de Alice.")))
-  
-  (println "===================================="))
+    (println "\n--- ESTADO FINAL DE LA RED ---")
+    (println "Bloques Cristalizados (Archivo):" (registro/arkivo-grandeco))
+    (println "Transacciones en Vector Vivo:  " (registro/viva-kalkulilo))
+    
+    (println "\n--- VERIFICACIÓN DE SALDO ---")
+    (let [saldo-final (registro/kalkuli-ekvilibron (sfero/ligi monero (:id-vektoro alice)))]
+      (println (format "Saldo total de Alice (Pasado + Presente): %.4f SFE" (double saldo-final)))
+      
+      (if (> saldo-final 20.0)
+        (println ">>> ÉXITO: El valor persiste a través de la cristalización.")
+        (println ">>> ERROR: Se ha perdido energía en el proceso.")))
+    
+    (println "====================================")))
