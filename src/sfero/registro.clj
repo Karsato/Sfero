@@ -14,6 +14,14 @@
              (mapv + malnova-stato subskribo))))
   (println "SFERO > Registro actualizado (Decaimiento aplicado)."))
 
+(defn vidi-staton []
+  "Permite que el explorador lea el estado actual del registro."
+  @stato-globala)
+
+(defn kalkuli-ekvilibron [identeco-vektoro]
+  (let [res (sfero/resonanco (vidi-staton) identeco-vektoro)]
+    (max 0.0 (- res 0.05))))
+
 (defn cxu-ekzistas? [subskribo]
   (let [res (sfero/resonanco @stato-globala subskribo)]
     (println (format "SFERO > Resonancia actual: %.4f" (double res)))

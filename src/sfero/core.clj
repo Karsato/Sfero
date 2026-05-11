@@ -62,3 +62,10 @@
 (defn skali [v faktoro]
   "Cambia la intensidad del vector. Útil para aplicar comisiones o pesos."
   (mapv #(* % (double faktoro)) v))
+
+(defn skani-registron [registro vortaro]
+  "Escanea el registro comparándolo con un diccionario de vectores conocidos.
+   Devuelve un ranking de lo que más resuena."
+  (->> vortaro
+       (map (fn [[nomo v]] [nomo (resonanco registro v)]))
+       (sort-by second >)))

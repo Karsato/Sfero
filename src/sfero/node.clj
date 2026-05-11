@@ -8,33 +8,36 @@
   (println "      SFERO NETWORK - v0.1.0       ")
   (println "====================================")
   
-  (let [alice (monujo/krei-monujon "alice-seed")
-        bob (monujo/krei-monujon "bob-seed")
+  (let [alice (monujo/krei-monujon "alice")
+        bob (monujo/krei-monujon "bob")
+        carol (monujo/krei-monujon "carol")
         monero (sfero/naski-vektoron 999)
-        tasa-comision 0.05] ;; 5% de comisión
+        
+        ;; Diccionario para el explorador
+        vortaro {"Alice" (:id-vektoro alice)
+                 "Bob"   (:id-vektoro bob)
+                 "Carol" (:id-vektoro carol)}]
 
-    ;; 1. Bob empieza con fondos
+    (println "--- Generando actividad en la red ---")
+    ;; Alice recibe 3 pagos, Bob 1, Carol 0
+    (dotimes [_ 3] (registro/aldoni-transakcion (sfero/ligi monero (:id-vektoro alice))))
     (registro/aldoni-transakcion (sfero/ligi monero (:id-vektoro bob)))
+
+    (println "\n--- SFERO ESPLORILO (Explorador de Hiperespacio) ---")
+    (println "Escaneando resonancias de identidad...")
     
-    (println "\n--- Transferencia con Comisión (Kotizo) ---")
-    (let [v-total (sfero/ligi monero (:id-vektoro bob))
-          
-          ;; El gasto de Bob (el 100%)
-          debito-bob (sfero/inversi v-total)
-          
-          ;; Lo que recibe Alice (el 95%)
-          kredito-alice (sfero/skali (sfero/ligi monero (:id-vektoro alice)) (- 1.0 tasa-comision))
-          
-          ;; Lo que recibe la Red (el 5%) - Usamos el mismo vector de Alice pero ligado a la Red
-          v-infra (sfero/naski-vektoron 777) ;; Vector identificador de infraestructura
-          kotizo (sfero/skali (sfero/ligi monero v-infra) tasa-comision)]
+    ;; Extraemos el estado actual del registro
+    (let [stato (registro/vidi-staton) 
+          rezultoj (sfero/skani-registron stato 
+                     (into {} (map (fn [[n v]] [n (sfero/ligi monero v)]) vortaro)))]
       
-      ;; Registramos la transferencia y la comisión
-      (registro/aldoni-transakcion (sfero/kunigo [debito-bob kredito-alice]))
-      (registro/aldoni-kotizon kotizo)
+      (doseq [[nomo valoro] rezultoj]
+        (let [bar-length (int (* valoro 10))]
+          (println (format "%-10s [%-15s] %.4f SFE" 
+                           nomo 
+                           (apply str (repeat (max 0 bar-length) "█")) 
+                           (double valoro)))))
 
-      (println (format "Saldo Final Bob:   %.4f SFE" (registro/kalkuli-ekvilibron (sfero/ligi monero (:id-vektoro bob)))))
-      (println (format "Saldo Final Alice: %.4f SFE" (registro/kalkuli-ekvilibron (sfero/ligi monero (:id-vektoro alice)))))
-      (println (format "Fondo Red (Infra): %.4f SFE" (sfero/resonanco (sfero/ligi monero v-infra) kotizo))))
-
-    (println "====================================")))
+      (println "\n>>> Análisis: El hiperespacio muestra una clara dominancia de Alice.")))
+  
+  (println "===================================="))
